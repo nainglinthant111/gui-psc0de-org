@@ -53,9 +53,11 @@
                 }
             })
             $("#search").on("click", function () {
+                
                 var positalcode = $("#positalcode").val();
                 checkvalide(positalcode);
                 if (check) {
+                    $(".loader-container").removeClass("d-none");
                     // var first = positalcode.substring(0, 4);
                     // var second = positalcode.replace(first, "");
                     // positalcode = first + "00" + second;
@@ -65,11 +67,12 @@
                         dataType: "json",
                         contentType: "application/json",
                         data: { zipCode: positalcode },
-                        // timeout: 30000,
+                        // timeout: 1000,
                         success: function (response) {
                             if (response.statusCode == 401) {
                                 $(".format").removeClass("d-none");
                             } else {
+                                $(".loader-container").addClass("d-none");
                                 $(".format").addClass("d-none");
                             }
                             if (response.data != null) {
@@ -83,6 +86,7 @@
                         }
 
                     });
+                
                 } else {
                     $(".hitsu").removeClass("d-none");
                     $(".format").addClass("d-none");
@@ -107,6 +111,42 @@
             height: auto;
             margin-top: 20px;
         }
+        .loader-container {
+            display: flex;
+            align-items: center;
+            position:absolute;
+            right: 20px;
+            top:3px;
+        }
+
+        .loader {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        border-radius: 50%;
+        background: linear-gradient(0deg, #FFFFFF 50%, #FF5C35 100%);
+        animation: spin 1s linear infinite;
+        }
+
+        .inner-circle {
+        width: 90%;
+        height: 90%;
+        background-color: white;
+        border-radius: 50%;
+        }
+
+        @keyframes spin {
+        from {
+            transform: rotate(0);
+        }
+        to{
+            transform: rotate(360deg);
+        }
+}
+.postd{
+    position:relative;
+}
     </style>
 </head>
 
@@ -117,7 +157,12 @@
                 <h1 class="mt-3">Search Myanmar Postal Code</h1>
                 <label class="mt-5"> Postal Code</label>
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-6 postd" >
+                        <div class="loader-container d-none">
+                            <div class="loader">
+                              <div class="inner-circle"></div>
+                            </div>
+                        </div>
                         <input type="text" id="positalcode" class="form-control" maxlength="7" />
                         <a href="https://postalcode-myanmar.vercel.app/demo" target="_blank">How to fill postalcode ?</a>
                         <br>
