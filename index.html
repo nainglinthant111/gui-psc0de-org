@@ -69,10 +69,11 @@
                         data: { zipCode: positalcode },
                         // timeout: 1000,
                         success: function (response) {
-                            $(".loader-container").addClass("d-none");
                             if (response.statusCode == 401) {
                                 $(".format").removeClass("d-none");
+                                $(".loader-container").addClass("d-none");
                             } else {
+                                $(".loader-container").addClass("d-none");
                                 $(".format").addClass("d-none");
                             }
                             if (response.data != null) {
