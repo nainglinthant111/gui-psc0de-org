@@ -1,212 +1,281 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        />
+        <link
+            rel="icon"
+            href="https://cdn-icons-png.flaticon.com/512/5685/5685166.png"
+            type="image/png"
+        />
+        <title>Myanmar Postal Code</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <link
+            rel="stylesheet"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        />
+        <script>
+            var response = null;
+            var resulten = null;
+            var resultmm = null;
+            var check = false;
+            $(document).ready(function () {
+                function checkvalide(positalcode) {
+                    if (positalcode.length == 7) {
+                        check = true;
+                        $(".hitsu").addClass("d-none");
+                        $(".format").addClass("d-none");
+                    } else {
+                        check = false;
+                        $(".hitsu").removeClass("d-none");
+                        $(".format").addClass("d-none");
+                    }
+                }
+                $("#positalcode").on("input", function () {
+                    var positalcode = $("#positalcode").val();
+                    var numericValue = positalcode.replace(/\D/g, "");
+                    $("#positalcode").val(numericValue);
+                    checkvalide(positalcode);
+                });
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/5685/5685166.png" type="image/png">
-    <title>Myanmar Postal Code</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script>
-        var response = null;
-        var resulten = null;
-        var resultmm = null;
-        var check = false;
-        $(document).ready(function () {
-            function checkvalide(positalcode) {
-                if (positalcode.length == 7) {
-                    check = true;
-                    $(".hitsu").addClass("d-none");
-                    $(".format").addClass("d-none");
-                } else {
-                    check = false;
-                    $(".hitsu").removeClass("d-none");
-                    $(".format").addClass("d-none");
+                function bilddata(resulten, resultmm) {
+                    if ($("#language1").is(":checked")) {
+                        $("#state").val(resulten.region);
+                        $("#city").val(resulten.town_township);
+                        $("#quater").val(resulten.qv_tract);
+                    } else if ($("#language2").is(":checked")) {
+                        $("#state").val(resultmm.region);
+                        $("#city").val(resultmm.town_township);
+                        $("#quater").val(resultmm.qv_tract);
+                    }
+                }
+                $(".language").on("click", function () {
+                    if (resulten || resultmm) {
+                        bilddata(resulten, resultmm);
+                    }
+                });
+                $("#search").on("click", function () {
+                    var positalcode = $("#positalcode").val();
+                    checkvalide(positalcode);
+                    if (check) {
+                        $(".loader-container").removeClass("d-none");
+                        // var first = positalcode.substring(0, 4);
+                        // var second = positalcode.replace(first, "");
+                        // positalcode = first + "00" + second;
+                        $.ajax({
+                            url: "https://myanmar-postal-code.vercel.app/api/data",
+                            type: "get",
+                            dataType: "json",
+                            contentType: "application/json",
+                            data: { zipCode: positalcode },
+                            // timeout: 1000,
+                            success: function (response) {
+                                if (response.statusCode == 401) {
+                                    $(".format").removeClass("d-none");
+                                    $(".loader-container").addClass("d-none");
+                                } else {
+                                    $(".loader-container").addClass("d-none");
+                                    $(".format").addClass("d-none");
+                                }
+                                if (response.data != null) {
+                                    resulten = response.data.en;
+                                    resultmm = response.data.mm;
+                                    bilddata(resulten, resultmm);
+                                }
+                            },
+                            error: function (xhr) {
+                                alert("Postal Code error!");
+                            },
+                        });
+                    } else {
+                        $(".hitsu").removeClass("d-none");
+                        $(".format").addClass("d-none");
+                    }
+                });
+            });
+        </script>
+        <style>
+            body {
+                height: 100vh;
+            }
+
+            .tsize {
+                font-size: 12px;
+            }
+            header {
+                height: 50px;
+                font-size: 24px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: #f4f4f4;
+                color: #666;
+            }
+
+            footer {
+                height: 50px;
+                display: flex;
+                justify-content: center;
+                background-color: #f4f4f4;
+                color: #666;
+                align-items: center;
+            }
+
+            .content-body {
+                min-height: calc(100vh - 100px);
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            img {
+                width: 100%;
+                height: auto;
+                margin-top: 20px;
+            }
+            .loader-container {
+                display: flex;
+                align-items: center;
+                position: absolute;
+                right: 20px;
+                top: 3px;
+            }
+
+            .loader {
+                width: 30px;
+                height: 30px;
+                display: flex;
+                align-items: center;
+                border-radius: 50%;
+                background: linear-gradient(0deg, #ffffff 50%, #ff5c35 100%);
+                animation: spin 1s linear infinite;
+            }
+
+            .inner-circle {
+                width: 90%;
+                height: 90%;
+                background-color: white;
+                border-radius: 50%;
+            }
+
+            @keyframes spin {
+                from {
+                    transform: rotate(0);
+                }
+                to {
+                    transform: rotate(360deg);
                 }
             }
-            $("#positalcode").on("input", function () {
-                var positalcode = $("#positalcode").val();
-                var numericValue = positalcode.replace(/\D/g, '');
-                $("#positalcode").val(numericValue);
-                checkvalide(positalcode);
-            });
-
-
-
-            function bilddata(resulten, resultmm) {
-
-                if ($("#language1").is(":checked")) {
-                    $("#state").val(resulten.region);
-                    $("#city").val(resulten.town_township);
-                    $("#quater").val(resulten.qv_tract);
-                } else if ($("#language2").is(":checked")) {
-                    $("#state").val(resultmm.region);
-                    $("#city").val(resultmm.town_township);
-                    $("#quater").val(resultmm.qv_tract);
-
-                }
+            .postd {
+                position: relative;
             }
-            $(".language").on("click", function () {
-                if (resulten || resultmm) {
-                    bilddata(resulten, resultmm);
-                }
-            })
-            $("#search").on("click", function () {
-                
-                var positalcode = $("#positalcode").val();
-                checkvalide(positalcode);
-                if (check) {
-                    $(".loader-container").removeClass("d-none");
-                    // var first = positalcode.substring(0, 4);
-                    // var second = positalcode.replace(first, "");
-                    // positalcode = first + "00" + second;
-                    $.ajax({
-                        url: "https://myanmar-postal-code.vercel.app/api/data",
-                        type: "get",
-                        dataType: "json",
-                        contentType: "application/json",
-                        data: { zipCode: positalcode },
-                        // timeout: 1000,
-                        success: function (response) {
-                            if (response.statusCode == 401) {
-                                $(".format").removeClass("d-none");
-                                $(".loader-container").addClass("d-none");
-                            } else {
-                                $(".loader-container").addClass("d-none");
-                                $(".format").addClass("d-none");
-                            }
-                            if (response.data != null) {
-                                resulten = response.data.en;
-                                resultmm = response.data.mm;
-                                bilddata(resulten, resultmm);
-                            }
-                        },
-                        error: function (xhr) {
-                            alert("Postal Code error!");
-                        }
+        </style>
+    </head>
 
-                    });
-                
-                } else {
-                    $(".hitsu").removeClass("d-none");
-                    $(".format").addClass("d-none");
-                }
-            });
-        });
-    </script>
-    <style>
-        .tsize {
-            font-size: 12px;
-        }
-
-        footer {
-            background-color: #f4f4f4;
-            padding: 20px;
-            text-align: center;
-            color: #666;
-        }
-
-        img {
-            width: 100%;
-            height: auto;
-            margin-top: 20px;
-        }
-        .loader-container {
-            display: flex;
-            align-items: center;
-            position:absolute;
-            right: 20px;
-            top:3px;
-        }
-
-        .loader {
-        width: 30px;
-        height: 30px;
-        display: flex;
-        align-items: center;
-        border-radius: 50%;
-        background: linear-gradient(0deg, #FFFFFF 50%, #FF5C35 100%);
-        animation: spin 1s linear infinite;
-        }
-
-        .inner-circle {
-        width: 90%;
-        height: 90%;
-        background-color: white;
-        border-radius: 50%;
-        }
-
-        @keyframes spin {
-        from {
-            transform: rotate(0);
-        }
-        to{
-            transform: rotate(360deg);
-        }
-}
-.postd{
-    position:relative;
-}
-    </style>
-</head>
-
-<body>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-lg-6 col-md-8 col-sm-12 mx-auto">
-                <h1 class="mt-3">Search Myanmar Postal Code</h1>
-                <label class="mt-5"> Postal Code</label>
-                <div class="row">
-                    <div class="col-6 postd" >
-                        <div class="loader-container d-none">
-                            <div class="loader">
-                              <div class="inner-circle"></div>
+    <body>
+        <div class="container-fluid">
+            <header class="">Search Myanmar Postal Code</header>
+            <div class="row content-body">
+                <div class="col-lg-6 col-md-8 col-sm-12 mx-auto">
+                    <label class="mt-5"> Postal Code</label>
+                    <div class="row">
+                        <div class="col-6 postd">
+                            <div class="loader-container d-none">
+                                <div class="loader">
+                                    <div class="inner-circle"></div>
+                                </div>
                             </div>
+                            <input
+                                type="text"
+                                id="positalcode"
+                                class="form-control"
+                                maxlength="7"
+                                placeholder="Eg:0101001"
+                            />
+                            <a
+                                href="https://postalcode-myanmar.vercel.app/demo"
+                                target="_blank"
+                                >How to fill postalcode ?</a
+                            >
+                            <br />
+                            <label class="hitsu text-danger d-none tsize">
+                                **Require right postal code**</label
+                            >
+                            <label class="format text-danger d-none tsize">
+                                **Worng Postal Code**</label
+                            >
                         </div>
-                        <input type="text" id="positalcode" class="form-control" maxlength="7" placeholder="Eg:0101001"/>
-                        <a href="https://postalcode-myanmar.vercel.app/demo" target="_blank">How to fill postalcode ?</a>
-                        <br>
-                        <label class="hitsu text-danger d-none tsize"> **Require right postal code**</label>
-                        <label class="format text-danger d-none tsize"> **Worng Postal Code**</label>
+                        <div class="col-6">
+                            <button
+                                class="btn border bg-primary col-12"
+                                id="search"
+                            >
+                                Search Address
+                            </button>
+                        </div>
                     </div>
-                    <div class="col-6">
-                        <button class="btn border bg-primary col-12" id="search"> Search Address</button>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-6">
-                        <label> State</label>
-                        <input type="text" id="state" class="form-control" />
-                    </div>
-                    <div class="col-6">
-                        <label> City</label>
-                        <input type="text" id="city" class="form-control" />
-                    </div>
-                    <div class="col-12">
-                        <label> Quater</label>
-                        <input type="text" id="quater" class="form-control" />
-                    </div>
-                </div>
-                <div class="col-6 mt-2">
                     <div class="row">
                         <div class="col-6">
-                            <input type="radio" name="language" class="language" id="language1" value="1"
-                                checked>English
+                            <label> State</label>
+                            <input
+                                type="text"
+                                id="state"
+                                class="form-control"
+                            />
                         </div>
                         <div class="col-6">
-                            <input type="radio" name="language" class="language" id="language2" value="2">Myanmar
+                            <label> City</label>
+                            <input
+                                type="text"
+                                id="city"
+                                class="form-control"
+                            />
+                        </div>
+                        <div class="col-12">
+                            <label> Quater</label>
+                            <input
+                                type="text"
+                                id="quater"
+                                class="form-control"
+                            />
                         </div>
                     </div>
+                    <div class="col-6 mt-2">
+                        <div class="row">
+                            <div class="col-6">
+                                <input
+                                    type="radio"
+                                    name="language"
+                                    class="language mx-2"
+                                    id="language1"
+                                    value="1"
+                                    checked
+                                />English
+                            </div>
+                            <div class="col-6">
+                                <input
+                                    type="radio"
+                                    name="language"
+                                    class="language mx-2"
+                                    id="language2"
+                                    value="2"
+                                />Myanmar
+                            </div>
+                        </div>
+                    </div>
+                    <img
+                        src="https://www.grcdi.nl/gsb/Images/congo%20kinshasa%20postal%20code.png"
+                        alt="img"
+                    />
                 </div>
-                <img src="https://www.grcdi.nl/gsb/Images/congo%20kinshasa%20postal%20code.png" alt="img">
-                <footer class="mt-5">
-                    <!-- Footer content -->
-                    &copy; 2024 Naing Lin Thant. All rights reserved.
-                </footer>
             </div>
+            <footer class="">
+                <!-- Footer content -->
+                &copy; 2024 Naing Lin Thant. All rights reserved.
+            </footer>
         </div>
-    </div>
-</body>
-
+    </body>
 </html>
